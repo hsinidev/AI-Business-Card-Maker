@@ -1,12 +1,10 @@
-# 📇 AI Business Card Maker
+# <div align="center">📇 AI Business Card Maker</div>
 
-<div align="center">
-
-**A modern, real-time business card designer built with React, TypeScript, and Tailwind CSS.**
-
-*Create and export print-ready, high-resolution business cards with an intuitive, cosmic-themed interface.*
-
-</div>
+<p align="center">
+  <strong>A modern, real-time business card designer built with React, TypeScript, and Tailwind CSS.</strong>
+  <br />
+  <em>Create and export print-ready, high-resolution business cards with an intuitive, cosmic-themed interface.</em>
+</p>
 
 <p align="center">
   <img alt="React" src="https://img.shields.io/badge/React-18-%2361DAFB?style=for-the-badge&logo=react&logoColor=white"/>
@@ -23,57 +21,39 @@
 
 ## ✨ Core Features
 
-<table>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>🎨 Real-Time Design Canvas</h3>
-      <ul>
-        <li>Instantly see your changes on the live SVG preview.</li>
-        <li>Customize text, title, company, and all contact details.</li>
-        <li>Intuitive controls for a seamless design experience.</li>
-      </ul>
-    </td>
-    <td width="50%" valign="top">
-      <h3>📚 100+ Professional Templates</h3>
-      <ul>
-        <li>Browse a huge library of curated design templates.</li>
-        <li>Apply any style with a single click.</li>
-        <li>Find inspiration from corporate, creative, and minimalist designs.</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top">
-      <h3>⚙️ Full Styling Control</h3>
-      <ul>
-        <li>Choose from a selection of professional web fonts.</li>
-        <li>Use color pickers for precise text and background colors.</li>
-        <li>Switch between classic left-aligned and modern center-aligned layouts.</li>
-      </ul>
-    </td>
-    <td width="50%" valign="top">
-      <h3>🖼️ High-Resolution Export</h3>
-      <ul>
-        <li>Export your final design as a <strong>300 DPI print-ready PNG</strong>.</li>
-        <li>The output is perfectly sized (1050x600 pixels) for professional printing.</li>
-        <li>All processing happens securely in your browser.</li>
-      </ul>
-    </td>
-  </tr>
-</table>
+| Feature                       | Description                                                                                                       |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| 🎨 **Real-Time Design Canvas**  | Instantly see your changes on a live SVG preview. Full customization of text, fonts, colors, and layouts.         |
+| 📚 **100+ Pro Templates**       | Kickstart your design with a single click from a massive library of curated, professional templates.              |
+| ⚙️ **Full Styling Control**     | Fine-tune your design with a selection of professional web fonts and precise color pickers for brand consistency. |
+| 🖼️ **High-Resolution Export**   | Download a **300 DPI print-ready PNG**, processed securely and instantly in your browser.                         |
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Architecture
 
-- **Framework**: [React 18](https://reactjs.org/)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-- **Rendering Engine**: **SVG** (Scalable Vector Graphics) for crisp, scalable visuals.
-- **Export Logic**: **HTML Canvas API** for converting SVG to a high-resolution PNG.
-- **SEO & Content**: Comprehensive guide on design principles to assist users.
+This project uses a modern frontend stack chosen for performance, scalability, and developer experience.
+
+| Technology         | Role & Justification                                                                                             |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **React 18**       | Powers the interactive and component-based user interface, allowing for efficient state management and rendering.  |
+| **TypeScript**     | Ensures code quality, maintainability, and scalability with static typing.                                       |
+| **Tailwind CSS**   | Provides a utility-first CSS framework for rapid, consistent, and modern UI development.                           |
+| **SVG**            | Serves as the core rendering engine for the card preview, ensuring crisp, scalable, and easily manipulated graphics. |
+| **HTML Canvas API**| Used as the export engine to convert the final SVG design into a high-resolution, print-ready PNG file.           |
+
+## ⚙️ How It Works: The Export Process
+
+The high-resolution export is a key feature handled entirely on the client-side for speed and privacy.
+
+1.  **Live SVG Rendering**: User customizations update the React state, which is passed as props to the `CardPreview` component, re-rendering the SVG in real-time.
+2.  **SVG Serialization**: On export, the live SVG DOM element is serialized into an XML string.
+3.  **Image Conversion**: The XML string is converted to a `base64` data URL and loaded into a new `Image()` object in memory.
+4.  **Canvas Scaling**: A new `<canvas>` element is created with dimensions scaled for 300 DPI (1050x600 pixels).
+5.  **High-Resolution Drawing**: Once loaded, the `Image` object (containing the SVG data) is drawn onto the high-resolution canvas.
+6.  **PNG Generation**: The canvas content is converted into a PNG data URL, which is then attached to an anchor link to trigger the browser download.
 
 ## 🚀 Getting Started
 
-This project is configured to run seamlessly in environments like AI Studio. To set up a similar project on your local machine, follow these steps:
+This project is configured to run seamlessly in modern web development environments like AI Studio. To run it locally:
 
 1.  **Clone the Repository**
     ```bash
@@ -88,35 +68,28 @@ This project is configured to run seamlessly in environments like AI Studio. To 
 
 3.  **Run the Development Server**
     ```bash
-    npm run dev
+    npm start
     ```
 
 4.  **Open in Browser**
-    Navigate to `http://localhost:5173` (or the port specified in your terminal).
+    Navigate to `http://localhost:3000` (or the port specified in your terminal).
 
 ## 📁 Project Structure
 
-The codebase is organized into a clean, component-based architecture for maintainability and scalability.
+The codebase is organized into a clean, component-based architecture.
 
 ```
 /
 ├── public/
+│   └── templates/        # Contains SVG files for template previews
 ├── src/
-│   ├── components/            # Reusable React components
-│   │   ├── CardDesignTool.tsx   # Main component with form & preview
-│   │   ├── CardPreview.tsx      # SVG visual representation
-│   │   ├── Layout.tsx           # Main app layout
-│   │   ├── Modal.tsx            # Reusable modal
-│   │   └── TemplateGallery.tsx  # Template browsing component
-│   ├── services/
-│   │   └── DesignExporter.ts    # Logic for SVG to PNG export
-│   ├── utils/
-│   │   ├── DesignMath.ts        # Constants for card dimensions
-│   │   └── SeoArticle.tsx       # In-depth SEO article
-│   ├── App.tsx                  # Root React component
-│   ├── constants.ts             # App-wide constants (fonts, templates)
-│   ├── index.tsx                # App entry point
-│   └── types.ts                 # TypeScript type definitions
+│   ├── components/       # Core, reusable React components
+│   ├── services/         # Business logic (e.g., DesignExporter)
+│   ├── utils/            # Helper functions and constants
+│   ├── App.tsx           # Root React component
+│   ├── constants.ts      # App-wide constants (fonts, template data)
+│   ├── index.tsx         # Application entry point
+│   └── types.ts          # TypeScript type definitions
 ├── index.html
 └── README.md
 ```
@@ -133,7 +106,7 @@ Contributions are welcome! If you have ideas for new features, bug fixes, or imp
 
 ## 📄 License
 
-This project is distributed under the MIT License. See `LICENSE` for more information.
+This project is distributed under the MIT License.
 
 ---
 

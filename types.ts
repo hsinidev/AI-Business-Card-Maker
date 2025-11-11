@@ -21,5 +21,6 @@ export interface Font {
 
 export interface Template {
   name: string;
+  file: string;
   data: Partial<CardData>;
 }

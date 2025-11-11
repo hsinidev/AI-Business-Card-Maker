@@ -1,118 +1,141 @@
-import React, { useState, useRef, ChangeEvent } from 'react';
-import { CardData } from '../types';
-import { FONTS } from '../constants';
+import React, { useState, useRef } from 'react';
+import { CardData, CardLayout } from '../types';
+import { FONTS, DEFAULT_CARD_DATA } from '../constants';
 import CardPreview from './CardPreview';
-import TemplateGallery from './TemplateGallery';
 import { exportSvgToPng } from '../services/DesignExporter';
-
-const initialCardData: CardData = {
-  name: 'John Doe',
-  title: 'Software Engineer',
-  company: 'Tech Solutions Inc.',
-  phone: '+1 (555) 123-4567',
-  email: 'john.doe@example.com',
-  website: 'www.example.com',
-  address: '123 Tech Street, Silicon Valley, CA',
-  fontFamily: 'Roboto',
-  textColor: '#FFFFFF',
-  backgroundColor: '#1A202C',
-  layout: 'left',
-};
+import TemplateGallery from './TemplateGallery';
 
 const CardDesignTool: React.FC = () => {
-  const [cardData, setCardData] = useState<CardData>(initialCardData);
+  const [cardData, setCardData] = useState<CardData>(DEFAULT_CARD_DATA);
+  const [isLoading, setIsLoading] = useState(false);
   const svgRef = useRef<SVGSVGElement>(null);
-  const [isExporting, setIsExporting] = useState(false);
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setCardData(prev => ({ ...prev, [name]: value }));
   };
-
-  const handleTemplateSelect = (templateData: Partial<CardData>) => {
-    setCardData(prev => ({ ...prev, ...templateData }));
-  };
   
+  const handleLayoutChange = (layout: CardLayout) => {
+    setCardData(prev => ({ ...prev, layout }));
+  };
+
   const handleExport = async () => {
     if (!svgRef.current) return;
-    setIsExporting(true);
+    setIsLoading(true);
     try {
-      // Scale of 1 gives 1050x600px which is 300DPI for a 3.5"x2" card.
       await exportSvgToPng(svgRef.current, 'business-card.png', 1);
     } catch (error) {
       console.error('Export failed:', error);
-      alert('An error occurred while exporting the card. Please try again.');
+      alert('There was an error exporting your card. Please try again.');
     } finally {
-      setIsExporting(false);
+      setIsLoading(false);
     }
   };
 
+  const handleSelectTemplate = (templateData: Partial<CardData>) => {
+    setCardData(prev => ({
+      ...prev,
+      ...templateData,
+    }));
+  };
+
+  const inputFields = [
+    { id: 'name', label: 'Name', placeholder: 'e.g., Jane Doe' },
+    { id: 'title', label: 'Title', placeholder: 'e.g., CEO / Founder' },
+    { id: 'company', label: 'Company', placeholder: 'e.g., Innovate Inc.' },
+    { id: 'phone', label: 'Phone', placeholder: 'e.g., (123) 456-7890' },
+    { id: 'email', label: 'Email', placeholder: 'e.g., jane.doe@innovate.com' },
+    { id: 'website', label: 'Website', placeholder: 'e.g., www.innovate.com' },
+    { id: 'address', label: 'Address', placeholder: 'e.g., 123 Innovation Dr.' },
+  ];
 
   return (
-    <div className="w-full max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
-      {/* Left Panel: Controls */}
-      <div className="lg:w-1/3 bg-gray-800/50 backdrop-blur-md p-6 rounded-lg shadow-2xl border border-white/10">
-        <h2 className="text-2xl font-bold mb-6 text-center text-white">Design Your Card</h2>
-        <div className="space-y-4">
-          {/* Text Inputs */}
-          <input type="text" name="name" value={cardData.name} onChange={handleInputChange} placeholder="Name" className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <input type="text" name="title" value={cardData.title} onChange={handleInputChange} placeholder="Title / Position" className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <input type="text" name="company" value={cardData.company} onChange={handleInputChange} placeholder="Company Name" className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <input type="text" name="phone" value={cardData.phone} onChange={handleInputChange} placeholder="Phone Number" className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <input type="email" name="email" value={cardData.email} onChange={handleInputChange} placeholder="Email Address" className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <input type="text" name="website" value={cardData.website} onChange={handleInputChange} placeholder="Website" className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          <input type="text" name="address" value={cardData.address} onChange={handleInputChange} placeholder="Address" className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-          
-          {/* Design Controls */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Font Family</label>
-              <select name="fontFamily" value={cardData.fontFamily} onChange={handleInputChange} className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                {FONTS.map(font => <option key={font.name} value={font.name}>{font.name}</option>)}
-              </select>
-            </div>
-             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Layout</label>
-              <select name="layout" value={cardData.layout} onChange={handleInputChange} className="w-full p-2 bg-gray-700 rounded border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                <option value="left">Left Aligned</option>
-                <option value="center">Center Aligned</option>
-              </select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="textColor" className="block text-sm font-medium text-gray-300 mb-1">Text Color</label>
-              <input id="textColor" type="color" name="textColor" value={cardData.textColor} onChange={handleInputChange} className="w-full h-10 p-1 bg-gray-700 rounded border border-gray-600" />
-            </div>
-            <div>
-              <label htmlFor="backgroundColor" className="block text-sm font-medium text-gray-300 mb-1">Background</label>
-              <input id="backgroundColor" type="color" name="backgroundColor" value={cardData.backgroundColor} onChange={handleInputChange} className="w-full h-10 p-1 bg-gray-700 rounded border border-gray-600" />
-            </div>
-          </div>
-        </div>
+    <div className="w-full max-w-7xl mx-auto flex flex-col items-center">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">Business Card Maker</h1>
+        <p className="mt-2 text-lg text-gray-300">Design your perfect card in real-time.</p>
       </div>
 
-      {/* Right Panel: Preview and Actions */}
-      <div className="lg:w-2/3 flex flex-col gap-8">
-        <div className="flex-grow bg-gray-800/50 backdrop-blur-md p-6 rounded-lg shadow-2xl border border-white/10 flex flex-col items-center justify-center">
-            <h2 className="text-2xl font-bold mb-4 text-center text-white">Live Preview</h2>
-            <div className="w-full max-w-lg aspect-[3.5/2]">
-                 <CardPreview ref={svgRef} data={cardData} />
+      <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-8">
+        
+        {/* Left Panel: Form Inputs */}
+        <div className="lg:col-span-2 bg-black/30 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-bold mb-4 text-white">👤 Personal Info</h3>
+              {inputFields.map(field => (
+                <div key={field.id} className="mb-4">
+                  <label htmlFor={field.id} className="block text-sm font-medium text-gray-300 mb-1">{field.label}</label>
+                  <input
+                    type="text"
+                    id={field.id}
+                    name={field.id}
+                    value={cardData[field.id as keyof CardData]}
+                    onChange={handleInputChange}
+                    placeholder={field.placeholder}
+                    className="w-full bg-gray-900/50 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  />
+                </div>
+              ))}
             </div>
+
+            <div>
+              <h3 className="text-xl font-bold mb-4 text-white">🎨 Style Controls</h3>
+              <div className="mb-4">
+                <label htmlFor="fontFamily" className="block text-sm font-medium text-gray-300 mb-1">Font Family</label>
+                <select name="fontFamily" id="fontFamily" value={cardData.fontFamily} onChange={handleInputChange} className="w-full bg-gray-900/50 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                  {FONTS.map(font => <option key={font.name} value={font.name}>{font.name}</option>)}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="textColor" className="block text-sm font-medium text-gray-300 mb-1">Text Color</label>
+                  <input type="color" id="textColor" name="textColor" value={cardData.textColor} onChange={handleInputChange} className="w-full h-10 p-1 bg-gray-900/50 border border-gray-600 rounded-md cursor-pointer" />
+                </div>
+                <div>
+                  <label htmlFor="backgroundColor" className="block text-sm font-medium text-gray-300 mb-1">Background</label>
+                  <input type="color" id="backgroundColor" name="backgroundColor" value={cardData.backgroundColor} onChange={handleInputChange} className="w-full h-10 p-1 bg-gray-900/50 border border-gray-600 rounded-md cursor-pointer" />
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-bold mb-4 text-white">📐 Layout</h3>
+              <div className="flex bg-gray-900/50 border border-gray-600 rounded-lg p-1">
+                <button onClick={() => handleLayoutChange('left')} className={`w-1/2 py-2 text-sm font-medium rounded-md transition ${cardData.layout === 'left' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>Left-Aligned</button>
+                <button onClick={() => handleLayoutChange('center')} className={`w-1/2 py-2 text-sm font-medium rounded-md transition ${cardData.layout === 'center' ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-700'}`}>Center-Aligned</button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="bg-gray-800/50 backdrop-blur-md p-6 rounded-lg shadow-2xl border border-white/10 flex-grow flex flex-col">
-            <TemplateGallery onSelectTemplate={handleTemplateSelect} />
-        </div>
-         <div className="text-center">
-            <button 
-              onClick={handleExport} 
-              disabled={isExporting}
-              className="w-full md:w-auto bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-indigo-700 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed transform hover:scale-105"
-            >
-              {isExporting ? 'Exporting...' : 'Export as PNG (300 DPI)'}
-            </button>
+
+        {/* Center Panel: Preview */}
+        <div className="lg:col-span-3 flex flex-col gap-8">
+          <div className="flex-grow flex items-center justify-center sticky top-24">
+            <div className="w-full max-w-xl aspect-[3.5/2]">
+               <CardPreview data={cardData} ref={svgRef} />
+            </div>
+          </div>
         </div>
       </div>
+      
+      {/* Bottom Section: Templates and Export */}
+       <div className="w-full grid grid-cols-1 lg:grid-cols-5 gap-8 mt-8">
+          <div className="lg:col-span-2">
+            {/* This space intentionally left blank to align with the form panel */}
+          </div>
+          <div className="lg:col-span-3 bg-black/30 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-lg">
+             <div className="h-96">
+                <TemplateGallery onSelectTemplate={handleSelectTemplate} />
+             </div>
+             <div className="mt-6 text-center">
+                 <button onClick={handleExport} disabled={isLoading} className="w-full px-8 py-4 bg-indigo-600 text-white font-bold rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-800 transition-all duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
+                     {isLoading ? 'Exporting...' : 'Export Print-Ready PNG (300 DPI)'}
+                 </button>
+             </div>
+          </div>
+       </div>
+
     </div>
   );
 };
